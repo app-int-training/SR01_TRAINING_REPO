@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="9091" doc:name="HTTP Listener Configuration"/>
+    <flow name="flow1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/flow1" doc:name="HTTP"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <dw:transform-message metadata:id="e5d9c26d-ba0c-4677-936c-5a77f2430846" doc:name="Transform Message">
+            <dw:input-payload doc:sample="json.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload]]></dw:set-payload>
+        </dw:transform-message>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+    </flow>
+     <flow name="flow2">
+     <http:listener config-ref="HTTP_Listener_Configuration" path="/flow2" metadata:id="ebd2c76b-1119-4a5c-91a6-df904fc336c2" doc:name="HTTP"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="4e80550e-0471-4731-bc58-c4913b24e706">
+            <dw:input-payload doc:sample="json.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+---
+details: {(
+	payload map {
+	airlineName:$.airlineName,
+	price:$.price,
+		deDate:$.departureDate,
+		pType:$.planeType,
+		orig:$.origination,
+		fCode:$.flightCode,
+		aSeats:$.availableSeats,
+		des:$.destination
+		})}
+
+		
+	]]></dw:set-payload>
+        </dw:transform-message>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+      </flow>
+    <flow name="flow3">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/flow3" doc:name="HTTP"/>
+        <dw:transform-message metadata:id="67806efe-9576-4c47-84be-f796a7669bd4" doc:name="Transform Message">
+            <dw:input-payload doc:sample="json_3.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload ]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload:java.lang.String]" level="INFO" doc:name="Logger"/>
+        <component class="com.appintegrators.training.util.Mainjava" doc:name="Java"/>
+        <logger message="#[payload:java.lang.String]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <flow name="flow4">
+     <http:listener config-ref="HTTP_Listener_Configuration" path="/flow4" doc:name="HTTP"/>
+        <set-payload value="{&quot;airlineName&quot;: &quot;JetAir&quot;,&quot;price&quot;: 23200,&quot;departureDate&quot;: &quot;2015/06/13&quot;,&quot;planeType&quot;: &quot;Boeing 737&quot;,&quot;origination&quot;: &quot;HYD&quot;,&quot;flightCode&quot;: &quot;ER38sd&quot;,&quot;availableSeats&quot;: 40,&quot;destination&quot;: &quot;SFO&quot;}" mimeType="application/json" doc:name="Set Payload"/>
+
+        <dw:transform-message metadata:id="54e4cbb3-4cec-43ee-ba68-3f22775d598f" doc:name="Transform Message">
+            <dw:input-payload doc:sample="json_1.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map {
+	flightCode: $$
+	}]]></dw:set-payload>
+        </dw:transform-message>
+
+        <logger message="#[payload:java.lang.String]" level="INFO" doc:name="Logger"/>
+        <set-payload value="#[message.payload]" doc:name="Set Payload"/>
+    </flow>
+    <flow name="flow5">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/flow5" doc:name="HTTP"/>
+        <set-payload value="{&quot;airlineName&quot;: &quot;Indigo&quot;,&quot;price&quot;: 25100,&quot;departureDate&quot;: &quot;2015/06/11&quot;,&quot;planeType&quot;: &quot;Boeing 777&quot;,&quot;origination&quot;: &quot;HYD&quot;,	&quot;flightCode&quot;: &quot;ER39rk&quot;,&quot;availableSeats&quot;: 54,&quot;destination&quot;: &quot;LOS&quot;},{&quot;airlineName&quot;:&quot;SpiceJet&quot;,&quot;price&quot;: 22900,&quot;departureDate&quot;:&quot;2015/06/12&quot;,&quot;planeType&quot;: &quot;Boeing 784&quot;,&quot;origination&quot;: &quot;HYD&quot;,&quot;flightCode&quot;: &quot;ER39rj&quot;,&quot;availableSeats&quot;: 23,&quot;destination&quot;: &quot;SFO&quot;}" doc:name="Set Payload" mimeType="application/json"/>
+        <dw:transform-message metadata:id="0614ccc1-dcf4-47a8-8f8c-0b01ab00d3ee" doc:name="Transform Message">
+            <dw:input-payload doc:sample="json.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map {
+	flightCode: $$,
+	destination: payload.destination
+	}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload:java.lang.String]" level="INFO" doc:name="Logger"/>
+        <set-payload value="#[payload:java.lang.String]" doc:name="Set Payload"/>
+    </flow>
+    <flow name="flow6">
+     <http:listener config-ref="HTTP_Listener_Configuration" path="/flow6" doc:name="HTTP"/>
+        <set-payload value="{&quot;airlineName&quot;: &quot;Indigo&quot;,&quot;price&quot;: 25100,&quot;departureDate&quot;: &quot;2015/06/11&quot;,&quot;planeType&quot;: &quot;Boeing 777&quot;,&quot;origination&quot;: &quot;HYD&quot;,	&quot;flightCode&quot;: &quot;ER39rk&quot;,&quot;availableSeats&quot;: 54,&quot;destination&quot;: &quot;LOS&quot;},{&quot;airlineName&quot;:&quot;SpiceJet&quot;,&quot;price&quot;: 22900,&quot;departureDate&quot;:&quot;2015/06/12&quot;,&quot;planeType&quot;: &quot;Boeing 784&quot;,&quot;origination&quot;: &quot;HYD&quot;,&quot;flightCode&quot;: &quot;ER39rj&quot;,&quot;availableSeats&quot;: 23,&quot;destination&quot;: &quot;SFO&quot;}" mimeType="application/json" doc:name="Set Payload"/>
+        <dw:transform-message metadata:id="93f6c8f9-459f-4d5e-8b02-4cc389a3c124" doc:name="Transform Message">
+            <dw:input-payload doc:sample="json.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map {
+	flightCode: "flight" ++ $$,
+	destination: payload.destination
+	}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload:java.lang.String]" level="INFO" doc:name="Logger"/>
+        <set-payload value="#[payload:java.lang.String]" doc:name="Set Payload"/>
+    </flow>
+</mule>

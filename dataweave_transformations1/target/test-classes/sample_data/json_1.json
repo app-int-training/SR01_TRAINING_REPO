@@ -1,0 +1,10 @@
+{
+	"airlineName": "JetAir",
+	"price": 23200,
+	"departureDate": "2015/06/13",
+	"planeType": "Boeing 737",
+	"origination": "HYD",
+	"flightCode": "ER38sd",
+	"availableSeats": 40,
+	"destination": "SFO"
+}
